@@ -2161,7 +2161,7 @@ impl Workbook {
                 DefinedNameType::Global => {}
                 _ => {
                     // Use the sheet name to find the corresponding index
-                    if let Some(&index) = sheet_name_to_index.get(&defined_name.range.split('!').next().unwrap()) {
+                    if let Some(&index) = sheet_name_to_index.get(&*defined_name.range.split('!').next().unwrap()) {
                         attributes.push(("localSheetId", index.to_string()));
                     }
                 }
