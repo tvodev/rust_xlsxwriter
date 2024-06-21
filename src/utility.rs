@@ -435,12 +435,14 @@ pub(crate) fn quote_sheetname(sheetname: &str) -> String {
 
     // Ignore strings that are already quoted.
     if !sheetname.starts_with('\'') {
-        // double quote and other single quotes.
+        // Double quote any single quotes within the sheet name.
         sheetname = sheetname.replace('\'', "''");
 
-        // Single quote the worksheet name if it contains any of the characters
-        // that Excel quotes when using the name in a formula.
-        if sheetname.contains(' ') || sheetname.contains('!') || sheetname.contains('\'') {
+        // Characters that trigger quoting in Excel.
+        let special_chars = [' ', '!', '\'', '-', '[', ']', '(', ')', '{', '}', '^', '&', ',', '=', '<', '>', '+', '@', '`', '~', '#', '$', '%'];
+
+        // Check if the sheet name contains any of the special characters.
+        if sheetname.chars().any(|c| special_chars.contains(&c)) {
             sheetname = format!("'{sheetname}'");
         }
     }
