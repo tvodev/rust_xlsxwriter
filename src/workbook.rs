@@ -2147,36 +2147,27 @@ impl Workbook {
     // Write the <definedNames> element.
     fn write_defined_names(&mut self) {
         self.writer.xml_start_tag_only("definedNames");
-    
-        // Create a map of sheet names to their indices
-        let sheet_name_to_index = self.worksheets.iter()
-            .enumerate()
-            .map(|(i, ws)| (ws.name.clone(), i as u32))
-            .collect::<HashMap<String, u32>>();
-    
+
         for defined_name in &self.defined_names {
             let mut attributes = vec![("name", defined_name.name())];
-    
+
             match defined_name.name_type {
                 DefinedNameType::Global => {}
                 _ => {
-                    // Use the sheet name to find the corresponding index
-                    if let Some(&index) = sheet_name_to_index.get(&defined_name.range.split('!').next().unwrap()) {
-                        attributes.push(("localSheetId", index.to_string()));
-                    }
+                    attributes.push(("localSheetId", defined_name.index.to_string()));
                 }
             }
-    
+
             if let DefinedNameType::Autofilter = defined_name.name_type {
                 attributes.push(("hidden", "1".to_string()));
             }
-    
+
             self.writer
                 .xml_data_element("definedName", &defined_name.range, &attributes);
         }
-    
+
         self.writer.xml_end_tag("definedNames");
-    }    
+    }
 
     // Write the <calcPr> element.
     fn write_calc_pr(&mut self) {
